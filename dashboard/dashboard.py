@@ -12,8 +12,7 @@ st.title("📊 Dashboard Analisis Peminjaman Sepeda")
 # Load data
 @st.cache_data
 def load_data():
-    import os
-    df = pd.read_csv(os.path.join(os.path.dirname(__file__), "day.csv"), parse_dates=["dteday"])
+    df = pd.read_csv("day.csv", parse_dates=["dteday"])
     season_map = {1: 'Semi', 2: 'Panas', 3: 'Gugur', 4: 'Dingin'}
     df['Musim'] = df['season'].map(season_map)
     return df
@@ -39,6 +38,7 @@ end_date = st.sidebar.date_input("Tanggal Akhir", min_value=min_date, max_value=
 # Validasi tanggal
 if start_date > end_date:
     st.sidebar.error("Tanggal awal tidak boleh melebihi tanggal akhir!")
+    st.stop()
 
 # Filter tahun untuk tren bulanan
 tahun_tersedia = sorted(data["dteday"].dt.year.unique())
@@ -52,6 +52,10 @@ filtered_data = data[
     (data["dteday"] <= pd.to_datetime(end_date))
 ]
 
+if filtered_data.empty:
+    st.warning("⚠️ Data kosong. Silakan ubah filter untuk melihat visualisasi.")
+    st.stop()
+
 # Filter khusus tren bulanan (agregasi per bulan)
 filtered_data_tahun = filtered_data[filtered_data["dteday"].dt.year == tahun]
 
@@ -61,18 +65,14 @@ monthly_data = filtered_data_tahun.resample('M', on='dteday').agg({'cnt': 'sum'}
 # Grafik Tren Bulanan
 st.subheader(f"📈 Tren Jumlah Peminjaman Sepeda per Bulan (Tahun {tahun})")
 fig1, ax1 = plt.subplots(figsize=(14, 5))
-
-# Menambahkan garis putus-putus dan marker dengan variasi
 sns.lineplot(data=monthly_data, x="dteday", y="cnt", ax=ax1, color='dodgerblue', 
              marker='o', linestyle='-', linewidth=2, markersize=7)
-
 ax1.set_xlabel("Bulan")
 ax1.set_ylabel("Jumlah Peminjaman")
 ax1.set_title(f"Tren Peminjaman Sepeda per Bulan ({tahun})")
-ax1.xaxis.set_major_locator(mdates.MonthLocator())  # Set interval bulan
-ax1.xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))  # Format: Jan 2012, Feb 2012
+ax1.xaxis.set_major_locator(mdates.MonthLocator())
+ax1.xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
 plt.xticks(rotation=45)
-
 st.pyplot(fig1)
 
 # Grafik Rata-Rata Peminjaman per Musim
@@ -85,6 +85,7 @@ st.pyplot(fig2)
 
 # Grafik Weekday vs Weekend
 st.subheader("📅 Rata-Rata Peminjaman: Weekday vs Weekend")
+filtered_data = filtered_data.copy()
 filtered_data["day_type"] = filtered_data["weekday"].apply(lambda x: "Weekend" if x >= 5 else "Weekday")
 fig3, ax3 = plt.subplots(figsize=(6, 4))
 sns.barplot(data=filtered_data, x="day_type", y="cnt", ax=ax3, palette="coolwarm")
