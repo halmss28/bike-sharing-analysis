@@ -12,7 +12,7 @@ st.title("📊 Dashboard Analisis Peminjaman Sepeda")
 # Load data
 @st.cache_data
 def load_data():
-    df = pd.read_csv("../day.csv", parse_dates=["dteday"])
+    df = pd.read_csv("dashboard/day.csv", parse_dates=["dteday"])
     season_map = {1: 'Semi', 2: 'Panas', 3: 'Gugur', 4: 'Dingin'}
     df['Musim'] = df['season'].map(season_map)
     return df
