@@ -7,7 +7,11 @@ from datetime import datetime
 
 # Konfigurasi halaman
 st.set_page_config(page_title="Dashboard Bike Sharing", layout="wide")
+
+st.write("✅ App berhasil dimulai.")
+
 st.title("📊 Dashboard Analisis Peminjaman Sepeda")
+
 
 # Load data
 @st.cache_data
