@@ -96,12 +96,3 @@ sns.barplot(data=filtered_data, x="day_type", y="cnt", ax=ax3, palette="coolwarm
 ax3.set_ylabel("Rata-rata Peminjaman")
 st.pyplot(fig3)
 
-# Insight Ringkas
-st.markdown("### 🔍 Insight Ringkas")
-st.markdown(f"""
-- Tren bulanan ditampilkan hanya untuk tahun **{tahun}**
-- Filter musim yang dipilih: **{', '.join(musim) if musim else 'Tidak ada'}**
-- Rentang tanggal yang dipilih: **{start_date.strftime('%Y-%m-%d')}** s.d. **{end_date.strftime('%Y-%m-%d')}**
-- Musim dengan rata-rata peminjaman tertinggi: **{avg_per_season.idxmax()}** ({avg_per_season.max():,.0f})
-- Musim dengan rata-rata terendah: **{avg_per_season.idxmin()}** ({avg_per_season.min():,.0f})
-""")
